@@ -36,16 +36,25 @@ jobs:
       architecture: 'x64'
 
 - job: Images
-  steps:
 
+  strategy:
+    matrix:
+      image1:
+        dockerfile: Dockerfile
+        repository: aaronwolen/azure-ci-test
+      image2:
+        dockerfile: Dockerfile-sh
+        repository: aaronwolen/azure-ci-test-2
+
+  steps:
   - task: Docker@2
     displayName: Docker image (latest)
     condition: or(eq(variables['build.sourceBranch'], 'refs/heads/master'), startsWith(variables['build.sourceBranch'], 'refs/tags'))
     inputs:
       containerRegistry: 'Docker Hub'
-      repository: 'aaronwolen/azure-ci-test'
+      repository: $(repository)
       command: 'buildAndPush'
-      Dockerfile: 'Dockerfile'
+      Dockerfile: $(dockerfile)
       buildContext: '.'
       tags: latest
 
@@ -54,8 +63,8 @@ jobs:
     condition: startsWith(variables['build.sourceBranch'], 'refs/tags')
     inputs:
       containerRegistry: 'Docker Hub'
-      repository: 'aaronwolen/azure-ci-test'
+      repository: $(repository)
       command: 'buildAndPush'
-      Dockerfile: 'Dockerfile'
+      Dockerfile: $(dockerfile)
       buildContext: '.'
       tags: $(Build.SourceBranchName)
