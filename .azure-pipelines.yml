@@ -6,19 +6,20 @@ trigger:
     include:
       - "*"
 
-strategy:
-  matrix:
-    linux:
-      imageName: 'ubuntu-18.04'
-      python.version: '3.x'
-
-pool:
-  vmImage: $(imageName)
-variables:
-  tag: '$(Build.BuildId)'
-
 jobs:
 - job: Setup
+
+  strategy:
+    matrix:
+      linux:
+        imageName: 'ubuntu-18.04'
+        python.version: '3.x'
+
+  pool:
+    vmImage: $(imageName)
+  variables:
+    tag: '$(Build.BuildId)'
+
   steps:
 
   - task: Bash@3
