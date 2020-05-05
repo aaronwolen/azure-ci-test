@@ -25,7 +25,7 @@ steps:
     architecture: 'x64'
 
 - task: Docker@2
-  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
+  # condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
   inputs:
     containerRegistry: 'Docker Hub'
     repository: 'aaronwolen/azure-ci-test'
@@ -33,5 +33,5 @@ steps:
     Dockerfile: 'Dockerfile'
     buildContext: '.'
     tags: |
-      $(tag)
+      $(Build.SourceBranchName)
       latest
