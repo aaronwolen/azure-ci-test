@@ -11,8 +11,11 @@ jobs:
 
   strategy:
     matrix:
-      linux:
+      linux18:
         imageName: 'ubuntu-18.04'
+        python.version: '3.x'
+      linux16:
+        imageName: 'ubuntu-16.04'
         python.version: '3.x'
 
   pool:
