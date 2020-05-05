@@ -1,8 +1,10 @@
 trigger:
   branches:
     include:
-    - master
-    - releases/*
+      - master
+  tags:
+    include:
+      - "*"
 
 strategy:
   matrix:
