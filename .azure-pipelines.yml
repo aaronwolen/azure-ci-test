@@ -19,19 +19,34 @@ variables:
 
 steps:
 
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: 'env | sort'
+
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(python.version)'
     architecture: 'x64'
 
 - task: Docker@2
-  # condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
+  displayName: Docker image (latest)
+  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
   inputs:
     containerRegistry: 'Docker Hub'
     repository: 'aaronwolen/azure-ci-test'
     command: 'buildAndPush'
     Dockerfile: 'Dockerfile'
     buildContext: '.'
-    tags: |
-      $(Build.SourceBranchName)
-      latest
+    tags: latest
+
+- task: Docker@2
+  displayName: Docker image (tagged release)
+  condition: startsWith(variables['build.sourceBranch'], 'refs/tags')
+  inputs:
+    containerRegistry: 'Docker Hub'
+    repository: 'aaronwolen/azure-ci-test'
+    command: 'push'
+    Dockerfile: 'Dockerfile'
+    buildContext: '.'
+    tags: $(Build.SourceBranchName)
