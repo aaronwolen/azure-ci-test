@@ -1,0 +1,30 @@
+trigger:
+  branches:
+    include:
+    - master
+    - releases/*
+
+strategy:
+  matrix:
+    linux:
+      imageName: 'ubuntu-18.04'
+      python.version: '3.x'
+
+pool:
+  vmImage: $(imageName)
+
+steps:
+
+  - task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+    architecture: 'x64'
+
+- task: Docker@2
+  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
+  inputs:
+    containerRegistry: 'Docker Hub'
+    repository: 'aaronwolen/azure-ci-test'
+    command: 'buildAndPush'
+    Dockerfile: 'Dockerfile'
+    buildContext: '.'
