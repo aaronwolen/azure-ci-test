@@ -36,6 +36,12 @@ jobs:
 
 - job: Images
   dependsOn: Setup
+  condition: |
+    or(
+      eq(variables['build.sourceBranch'], 'refs/heads/master'),
+      startsWith(variables['build.sourceBranch'], 'refs/tags')
+    )
+
   strategy:
     matrix:
       image1:

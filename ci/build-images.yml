@@ -2,7 +2,6 @@ steps:
 
   - task: Docker@2
     displayName: Docker image (latest)
-    condition: or(eq(variables['build.sourceBranch'], 'refs/heads/master'), startsWith(variables['build.sourceBranch'], 'refs/tags'))
     inputs:
       containerRegistry: 'Docker Hub'
       repository: $(repository)
