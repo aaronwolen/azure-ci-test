@@ -47,6 +47,7 @@ jobs:
         repository: aaronwolen/azure-ci-test-2
 
   steps:
+  - template: ci/build-images.yml
   - task: Docker@2
     displayName: Docker image (latest)
     condition: or(eq(variables['build.sourceBranch'], 'refs/heads/master'), startsWith(variables['build.sourceBranch'], 'refs/tags'))
