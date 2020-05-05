@@ -24,7 +24,6 @@ jobs:
     tag: '$(Build.BuildId)'
 
   steps:
-
   - task: Bash@3
     inputs:
       targetType: 'inline'
@@ -36,6 +35,12 @@ jobs:
       architecture: 'x64'
 
 - job: Images
+  dependsOn: Setup
+  condition: |
+    or(
+      eq(variables['build.sourceBranch'], 'refs/heads/master'),
+      startsWith(variables['build.sourceBranch'], 'refs/tags')
+    )
 
   strategy:
     matrix:
@@ -47,24 +52,4 @@ jobs:
         repository: aaronwolen/azure-ci-test-2
 
   steps:
-  - task: Docker@2
-    displayName: Docker image (latest)
-    condition: or(eq(variables['build.sourceBranch'], 'refs/heads/master'), startsWith(variables['build.sourceBranch'], 'refs/tags'))
-    inputs:
-      containerRegistry: 'Docker Hub'
-      repository: $(repository)
-      command: 'buildAndPush'
-      Dockerfile: $(dockerfile)
-      buildContext: '.'
-      tags: latest
-
-  - task: Docker@2
-    displayName: Docker image (tagged release)
-    condition: startsWith(variables['build.sourceBranch'], 'refs/tags')
-    inputs:
-      containerRegistry: 'Docker Hub'
-      repository: $(repository)
-      command: 'buildAndPush'
-      Dockerfile: $(dockerfile)
-      buildContext: '.'
-      tags: $(Build.SourceBranchName)
+  - template: ci/build-images.yml
