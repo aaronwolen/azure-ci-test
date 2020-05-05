@@ -12,6 +12,8 @@ strategy:
 
 pool:
   vmImage: $(imageName)
+variables:
+  tag: '$(Build.BuildId)'
 
 steps:
 
@@ -28,3 +30,6 @@ steps:
     command: 'buildAndPush'
     Dockerfile: 'Dockerfile'
     buildContext: '.'
+    tags: |
+      $(tag)
+      latest
