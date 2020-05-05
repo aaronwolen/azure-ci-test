@@ -32,7 +32,7 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
 
-- job: Build Images
+- job: Images
   steps:
 
   - task: Docker@2
