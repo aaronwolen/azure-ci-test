@@ -17,36 +17,41 @@ pool:
 variables:
   tag: '$(Build.BuildId)'
 
-steps:
+jobs:
+- job: Setup
+  steps:
 
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: 'env | sort'
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: 'env | sort'
 
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-    architecture: 'x64'
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
 
-- task: Docker@2
-  displayName: Docker image (latest)
-  condition: or(eq(variables['build.sourceBranch'], 'refs/heads/master'), startsWith(variables['build.sourceBranch'], 'refs/tags'))
-  inputs:
-    containerRegistry: 'Docker Hub'
-    repository: 'aaronwolen/azure-ci-test'
-    command: 'buildAndPush'
-    Dockerfile: 'Dockerfile'
-    buildContext: '.'
-    tags: latest
+- job: Build Images
+  steps:
 
-- task: Docker@2
-  displayName: Docker image (tagged release)
-  condition: startsWith(variables['build.sourceBranch'], 'refs/tags')
-  inputs:
-    containerRegistry: 'Docker Hub'
-    repository: 'aaronwolen/azure-ci-test'
-    command: 'buildAndPush'
-    Dockerfile: 'Dockerfile'
-    buildContext: '.'
-    tags: $(Build.SourceBranchName)
+  - task: Docker@2
+    displayName: Docker image (latest)
+    condition: or(eq(variables['build.sourceBranch'], 'refs/heads/master'), startsWith(variables['build.sourceBranch'], 'refs/tags'))
+    inputs:
+      containerRegistry: 'Docker Hub'
+      repository: 'aaronwolen/azure-ci-test'
+      command: 'buildAndPush'
+      Dockerfile: 'Dockerfile'
+      buildContext: '.'
+      tags: latest
+
+  - task: Docker@2
+    displayName: Docker image (tagged release)
+    condition: startsWith(variables['build.sourceBranch'], 'refs/tags')
+    inputs:
+      containerRegistry: 'Docker Hub'
+      repository: 'aaronwolen/azure-ci-test'
+      command: 'buildAndPush'
+      Dockerfile: 'Dockerfile'
+      buildContext: '.'
+      tags: $(Build.SourceBranchName)
