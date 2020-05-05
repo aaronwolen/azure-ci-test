@@ -1,6 +1,6 @@
 FROM amazonlinux:latest
 
 # Install some dependencies
-RUN yum -y wget && yum clean all
+RUN yum -y install wget git && yum clean all
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT [ "/bin/bash" ]
