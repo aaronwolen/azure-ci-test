@@ -6,47 +6,53 @@ trigger:
     include:
       - "*"
 
-strategy:
-  matrix:
-    linux:
-      imageName: 'ubuntu-18.04'
-      python.version: '3.x'
+jobs:
+- job: Setup
 
-pool:
-  vmImage: $(imageName)
-variables:
-  tag: '$(Build.BuildId)'
+  strategy:
+    matrix:
+      linux:
+        imageName: 'ubuntu-18.04'
+        python.version: '3.x'
 
-steps:
+  pool:
+    vmImage: $(imageName)
+  variables:
+    tag: '$(Build.BuildId)'
 
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: 'env | sort'
+  steps:
 
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-    architecture: 'x64'
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: 'env | sort'
 
-- task: Docker@2
-  displayName: Docker image (latest)
-  condition: or(eq(variables['build.sourceBranch'], 'refs/heads/master'), startsWith(variables['build.sourceBranch'], 'refs/tags'))
-  inputs:
-    containerRegistry: 'Docker Hub'
-    repository: 'aaronwolen/azure-ci-test'
-    command: 'buildAndPush'
-    Dockerfile: 'Dockerfile'
-    buildContext: '.'
-    tags: latest
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
 
-- task: Docker@2
-  displayName: Docker image (tagged release)
-  condition: startsWith(variables['build.sourceBranch'], 'refs/tags')
-  inputs:
-    containerRegistry: 'Docker Hub'
-    repository: 'aaronwolen/azure-ci-test'
-    command: 'buildAndPush'
-    Dockerfile: 'Dockerfile'
-    buildContext: '.'
-    tags: $(Build.SourceBranchName)
+- job: Images
+  steps:
+
+  - task: Docker@2
+    displayName: Docker image (latest)
+    condition: or(eq(variables['build.sourceBranch'], 'refs/heads/master'), startsWith(variables['build.sourceBranch'], 'refs/tags'))
+    inputs:
+      containerRegistry: 'Docker Hub'
+      repository: 'aaronwolen/azure-ci-test'
+      command: 'buildAndPush'
+      Dockerfile: 'Dockerfile'
+      buildContext: '.'
+      tags: latest
+
+  - task: Docker@2
+    displayName: Docker image (tagged release)
+    condition: startsWith(variables['build.sourceBranch'], 'refs/tags')
+    inputs:
+      containerRegistry: 'Docker Hub'
+      repository: 'aaronwolen/azure-ci-test'
+      command: 'buildAndPush'
+      Dockerfile: 'Dockerfile'
+      buildContext: '.'
+      tags: $(Build.SourceBranchName)
